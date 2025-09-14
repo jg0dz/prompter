@@ -1,47 +1,43 @@
-# Use uma versão mais recente e estável do Node.js
-FROM node:20-alpine AS builder
+# Usar Node.js LTS
+FROM node:20-alpine
 
-# Instalar dependências necessárias para build
-RUN apk add --no-cache libc6-compat
-
+# Configurar diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivos de dependências primeiro para melhor cache
+# Copiar arquivos do projeto
 COPY package*.json ./
-
-# Instalar dependências
-RUN npm ci --only=production --silent
-
-# Copiar código fonte
 COPY . .
 
-# Build da aplicação
+# Instalar dependências e fazer build
+RUN npm install
 RUN npm run build
 
-# Estágio de produção com Nginx
-FROM nginx:alpine
+# Instalar e configurar Nginx
+RUN apk add --no-cache nginx curl && \
+    mkdir -p /run/nginx
 
-# Instalar curl para health check
-RUN apk add --no-cache curl
-
-# Copiar arquivos buildados
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Configuração do Nginx para SPA
+# Configurar Nginx para SPA
 RUN echo 'server { \
     listen 80; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
+    root /app/dist; \
     index index.html; \
+    \
+    # Gzip \
+    gzip on; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript; \
+    \
+    # SPA routing \
     location / { \
         try_files $uri $uri/ /index.html; \
     } \
+    \
+    # Health check \
     location /health { \
         access_log off; \
         return 200 "healthy\n"; \
         add_header Content-Type text/plain; \
     } \
-}' > /etc/nginx/conf.d/default.conf
+}' > /etc/nginx/http.d/default.conf
 
 # Expor porta
 EXPOSE 80
@@ -50,5 +46,13 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/health || exit 1
 
-# Comando para iniciar o Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Script de inicialização
+COPY <<EOF /start.sh
+#!/bin/sh
+nginx -g 'daemon off;'
+EOF
+
+RUN chmod +x /start.sh
+
+# Comando para iniciar
+CMD ["/start.sh"]
