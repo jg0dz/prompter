@@ -1,0 +1,38 @@
+{
+  "name": "llm-prompter",
+  "version": "1.0.0",
+  "description": "LLM Prompter - Interface para teste e configuração de prompts com modelos de linguagem grandes",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "echo 'No linter configured'",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "llm",
+    "prompt-engineering",
+    "ai",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "author": "jg0dz",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^1.19.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "typescript": "~5.8.2",
+    "vite": "^7.1.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

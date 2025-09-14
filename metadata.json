@@ -1,0 +1,5 @@
+{
+  "name": "LLM Prompter",
+  "description": "An advanced UI for configuring, editing, and testing prompts with Large Language Models. Features include customizable system prompt blocks, model parameter tuning, and a clear output display, inspired by professional LLM development tools.",
+  "requestFramePermissions": []
+}
